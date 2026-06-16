@@ -24,7 +24,7 @@
       "subtitle": "Claude Code",
       "description": "At-a-glance status of Claude Code sessions in the menu bar.",
       "mode": "menu-bar",
-      "interval": "30s"
+      "interval": "1m"
     }
   ],
   "preferences": [

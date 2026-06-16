@@ -13,6 +13,28 @@ const SESSIONS_ENDPOINT = "https://api.anthropic.com/v1/code/sessions";
 const OAUTH_BETA_HEADER = "oauth-2025-04-20";
 const WEB_BASE_URL = "https://claude.ai/code";
 
+/** Thrown on HTTP 429 so callers can show a calm message instead of a hard error. */
+export class RateLimitError extends Error {
+  readonly retryAfterSeconds?: number;
+  constructor(retryAfterSeconds?: number) {
+    const when = retryAfterSeconds ? ` Try again in ~${retryAfterSeconds}s.` : "";
+    super(`Claude is rate limiting requests.${when} It refreshes automatically.`);
+    this.name = "RateLimitError";
+    this.retryAfterSeconds = retryAfterSeconds;
+  }
+}
+
+/** Parse a Retry-After header (delta-seconds or HTTP-date) into seconds. */
+function parseRetryAfter(res: Response): number | undefined {
+  const header = res.headers.get("retry-after");
+  if (!header) return undefined;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds)) return Math.max(0, Math.round(seconds));
+  const date = Date.parse(header);
+  if (!Number.isNaN(date)) return Math.max(0, Math.round((date - Date.now()) / 1000));
+  return undefined;
+}
+
 /** Raw shape of one item in the `data` array (only fields we use). */
 interface RawSession {
   id?: string;
@@ -162,6 +184,9 @@ export async function listSessions(options: ListOptions = {}): Promise<CodeSessi
   if (res.status === 401 || res.status === 403) {
     throw new Error("Claude rejected the login token. Run `claude` and sign in again, then retry.");
   }
+  if (res.status === 429) {
+    throw new RateLimitError(parseRetryAfter(res));
+  }
   if (!res.ok) {
     throw new Error(`Claude sessions API returned HTTP ${res.status}.`);
   }
@@ -199,6 +224,9 @@ export async function archiveSession(id: string): Promise<void> {
   if (res.status === 200 || res.status === 409) return;
   if (res.status === 401 || res.status === 403) {
     throw new Error("Claude rejected the login token. Run `claude` and sign in again, then retry.");
+  }
+  if (res.status === 429) {
+    throw new RateLimitError(parseRetryAfter(res));
   }
   throw new Error(`Could not archive session (HTTP ${res.status}).`);
 }

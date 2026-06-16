@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Color, Icon, List, getPreferenceValues } from "@raycast/api";
 import { showFailureToast, useCachedPromise } from "@raycast/utils";
-import { listSessions, type CodeSession } from "./api";
+import { listSessions, RateLimitError, type CodeSession } from "./api";
 import { killSession } from "./actions";
 import { connectionVisual, relativeTime, sessionKey, statusVisual } from "./presentation";
 
@@ -17,7 +17,8 @@ export default function Command() {
     {
       initialData: [] as CodeSession[],
       onError: (error) => {
-        void showFailureToast(error, { title: "Could not load Claude sessions" });
+        const title = error instanceof RateLimitError ? "Claude rate limit" : "Could not load Claude sessions";
+        void showFailureToast(error, { title });
       },
     },
   );
