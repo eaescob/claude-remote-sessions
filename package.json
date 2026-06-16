@@ -1,0 +1,73 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "claude-remote-sessions",
+  "title": "Claude Remote Sessions",
+  "description": "Inventory and open your Claude Code Remote Control sessions without juggling browser tabs.",
+  "icon": "command-icon.png",
+  "author": "eaescob",
+  "categories": [
+    "Developer Tools",
+    "Productivity"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "list-sessions",
+      "title": "List Remote Sessions",
+      "subtitle": "Claude Code",
+      "description": "Browse running Claude Code sessions and open their Remote Control web view.",
+      "mode": "view"
+    },
+    {
+      "name": "menubar",
+      "title": "Remote Sessions Menu Bar",
+      "subtitle": "Claude Code",
+      "description": "At-a-glance status of Claude Code sessions in the menu bar.",
+      "mode": "menu-bar",
+      "interval": "30s"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "onlyRemoteControl",
+      "type": "checkbox",
+      "required": false,
+      "title": "Sessions",
+      "label": "Only show Remote Control sessions",
+      "description": "Hide dispatch, cowork, and other non-Remote-Control sessions.",
+      "default": true
+    },
+    {
+      "name": "includeArchived",
+      "type": "checkbox",
+      "required": false,
+      "title": "Archived",
+      "label": "Show archived sessions",
+      "description": "Include sessions marked archived in the list.",
+      "default": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.83.0",
+    "@raycast/utils": "^1.18.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  },
+  "allowScripts": {
+    "esbuild@0.27.7": true
+  }
+}
